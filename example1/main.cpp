@@ -9,15 +9,15 @@ double func(double x) {
 
 int main(int argc, char *argv[]) {
     system("chcp 65001"); // utf-8
-    double start_time = 0, end_time = 0;
-
+    
+    double start_time = 0., end_time = 0.;    
     double a = 0., b = 2. * M_PI, result = 0.;
     int number_steps = 100000000;
     double h = (b - a) / number_steps;
 
-    start_time = omp_get_wtime();
-
     omp_set_num_threads(2);
+
+    start_time = omp_get_wtime();
 
 #pragma omp parallel reduction(+: result)
     {
