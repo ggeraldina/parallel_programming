@@ -10,7 +10,7 @@ double func(double x) {
 int main(int argc, char *argv[]) {
     system("chcp 65001"); // utf-8
     double start_time = 0, end_time = 0;
-    
+
     double a = 0., b = 2. * M_PI, result = 0.;
     int number_steps = 100000000;
     double h = (b - a) / number_steps;
@@ -19,12 +19,16 @@ int main(int argc, char *argv[]) {
 
     omp_set_num_threads(2);
 
-    #pragma omp parallel reduction(+: result)
+#pragma omp parallel reduction(+: result)
     {
-        #pragma omp for
-        for(int i = 1; i < number_steps; i++) 
+#pragma omp for
+        for (int i = 1; i < number_steps; i++)
             result += func(a + i * h);
-        printf("Закончил работу поток №%d из %d потоков\n", omp_get_thread_num(), omp_get_num_threads());
+        printf(
+            "Закончил работу поток №%d из %d потоков\n", 
+            omp_get_thread_num(), 
+            omp_get_num_threads()
+        );
     }
 
     end_time = omp_get_wtime();
