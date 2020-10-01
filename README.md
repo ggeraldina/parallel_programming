@@ -8,3 +8,4 @@
 OpenMP ](https://parallel.ru/sites/default/files/info/parallel/openmp/OpenMP.pdf)
 
 * example1 - подсчет интеграла
+* example2 - решение дифференциальных уравнений меодом Рунге-Кутты
