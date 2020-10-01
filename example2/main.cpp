@@ -19,16 +19,16 @@ int main(int argc, char *argv[]) {
         double x_a = a, y_a = 1.72; // y(0) = 1, когда y(-10) = 1.72
         double n = (b - a) / h;
         double current_x = x_a, current_y = y_a;
-        double current_k1 = 0, current_k2 = 0, current_k3 = 0, current_k4 = 0;        
+        double current_k1 = 0., current_k2 = 0., current_k3 = 0., current_k4 = 0.;        
         
         for (int i = 0; i < n; i++) {
             printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", i, current_x, i, current_y);
             current_k1 = func(current_x, current_y);
-            current_k2 = func(current_x + h / 2.0, current_y + current_k1 / 2.0);
-            current_k3 = func(current_x + h / 2, current_y + current_k2 / 2);
+            current_k2 = func(current_x + h / 2., current_y + current_k1 / 2.);
+            current_k3 = func(current_x + h / 2., current_y + current_k2 / 2.);
             current_k4 = func(current_x + h, current_y + current_k3);
             current_x += h;
-            current_y = current_y + h * (current_k1 + 2 * current_k2 + 2 * current_k3 + current_k4) / 6;
+            current_y = current_y + h * (current_k1 + 2. * current_k2 + 2. * current_k3 + current_k4) / 6.;
         }
         
         printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", (int) n, current_x,  (int) n, current_y);
