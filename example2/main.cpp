@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cmath>
 
-double func(double x, double y){
+double func(double x, double y) {
         // Уравнение: y' = y * cos(x)
         // Решение: y = e^sin(x) + C
         // 
