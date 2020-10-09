@@ -1,18 +1,19 @@
-// решение дифференциального уравнения
-// y' = y * cos(x), y(0) = 1
-// методом Рунге-Кутты
-
 #include <iostream>
 #include <cmath>
 #include <stdlib.h>
 
-double func(double x, double y) {
-    // Уравнение: y' = y * cos(x)
-    // Решение: y = e^sin(x) + C
-    // 
-    // Задача Коши: y' = y * cos(x), y(0) = 1
-    // Решение: y = e^sin(x)
-    return y * cos(x);
+#define N 2
+
+// стр. 9 Пример 2 http://imas.tpu.ru/lecture/d_e_systems.pdf
+
+typedef double (*Function) (double, double*);
+
+double func_1(double x, double *y) {
+    return - 1 - 4 * x  + 4 * y[0] - 5 * y[1];
+}
+
+double func_2(double x, double *y) {
+    return x  + y[0] - 2 * y[1];
 }
 
 void parse_argv(int argc, char *argv[], double *a, double *b, double *h) {
@@ -37,23 +38,67 @@ double compute_next_y(
 }
 
 int main(int argc, char *argv[]) {
-    double a = -10., b = 10., h = 1.;
+    double a = -0.5, b = 0.5, h = 0.05;
     parse_argv(argc, argv, &a, &b, &h);
-    double x_a = a, y_a = exp(sin(a));
+    double x_a = a;
+    Function func[N] = {func_1, func_2};     
+    double y_a[N] = {10 * exp(3 * a) + exp(- 1 * a), 2 * exp(3 * a) + exp(- 1 * a)};
     double n = (b - a) / h;
-    double current_x = x_a, current_y = y_a;
-    double current_k1 = 0., current_k2 = 0., current_k3 = 0., current_k4 = 0.;        
-    
-    for (int i = 0; i < n; i++) {
-        printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", i, current_x, i, current_y);
-        current_k1 = func(current_x, current_y);
-        current_k2 = func(current_x + h / 2., current_y + current_k1 * h / 2.);
-        current_k3 = func(current_x + h / 2., current_y + current_k2 * h / 2.);
-        current_k4 = func(current_x + h, current_y + current_k3 * h);
-        current_x += h;
-        current_y = compute_next_y(h, current_y, current_k1, current_k2, current_k3, current_k4);
+    double current_x = x_a;
+    double current_y[N];    
+    double current_k1[N], current_k2[N], current_k3[N], current_k4[N];
+    for (int i = 0; i < N; i++) {
+        current_y[i] = y_a[i];
+        current_k1[i] = 0.;
+        current_k2[i] = 0.;
+        current_k3[i] = 0.;
+        current_k4[i] = 0.;
     }
     
-    printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", (int) n, current_x,  (int) n, current_y);
+    
+    for (int i = 0; i < n; i++) {
+        printf("\nx[%2d] = %3.16g\n", i, current_x);  
+        for (int j = 0; j < N; j++) {
+            printf("y[%2d, %2d] = %3.16g; ", i, j, current_y[j]);            
+        }
+        for (int j = 0; j < N; j++) {     
+            current_k1[j] = func[j](current_x, current_y);
+        }
+        for (int j = 0; j < N; j++) {     
+            double current_y_k2[N];
+            for (int s = 0; s < N; s++) {
+                current_y_k2[s] = current_y[s] + current_k1[s] * h / 2.;
+            }            
+            current_k2[j] = func[j](current_x + h / 2., current_y_k2);
+        }
+        for (int j = 0; j < N; j++) {     
+            double current_y_k3[N];
+            for (int s = 0; s < N; s++) {
+                current_y_k3[s] = current_y[s] + current_k2[s] * h / 2.;
+            }            
+            current_k3[j] = func[j](current_x + h / 2., current_y_k3);
+        }
+        for (int j = 0; j < N; j++) {                 
+            double current_y_k4[N];
+            for (int s = 0; s < N; s++) {
+                current_y_k4[s] = current_y[s] + current_k3[s] * h;
+            }            
+            current_k4[j] = func[j](current_x + h, current_y_k4);
+        }
+        current_x += h;
+        for (int j = 0; j < N; j++) {
+            current_y[j] = compute_next_y(
+                h, current_y[j], 
+                current_k1[j], current_k2[j], 
+                current_k3[j], current_k4[j]
+            );
+        }
+    }
+    printf("\nx[%2d] = %3.16g\n", (int) n, current_x);
+    for (int i = 0; i < N; i++) {
+        printf("y[%2d, %2d] = %3.16g; ", (int) n, i, current_y[i]);
+    }
     return 0;
 }
+
+// Ответ (график) http://www.yotx.ru/#!1/3_h/ubB4yz/QPG2b4RQ/hf2z/aP9g/2PeTUmv7WwfgtfWNC/DeLnRtfWNzC7y3u3%40wT6JhN3ZOGY%40nW4zHrcuL3f2t/R3w2vrGBXhvF7q2vrG5Bd7b3T/YJ9GwGzunjMfTLcbj1uXF7v7WPgI=
