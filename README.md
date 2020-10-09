@@ -9,3 +9,4 @@ OpenMP ](https://parallel.ru/sites/default/files/info/parallel/openmp/OpenMP.pdf
 
 * example1 - подсчет интеграла
 * example2 - решение дифференциального уравнения методом Рунге-Кутты
+* example3 - решение системы ОДУ методом Рунге-Кутты
