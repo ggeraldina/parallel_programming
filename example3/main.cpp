@@ -25,6 +25,17 @@ void parse_argv(int argc, char *argv[], double *a, double *b, double *h) {
     *h = atof(argv[3]);
 }
 
+double compute_next_y(
+        double h, 
+        double y, 
+        double k1, 
+        double k2, 
+        double k3, 
+        double k4
+    ) {
+    return y + h * (k1 + 2. * k2 + 2. * k3 + k4) / 6.;
+}
+
 int main(int argc, char *argv[]) {
     double a = -10., b = 10., h = 1.;
     parse_argv(argc, argv, &a, &b, &h);
@@ -40,7 +51,7 @@ int main(int argc, char *argv[]) {
         current_k3 = func(current_x + h / 2., current_y + current_k2 * h / 2.);
         current_k4 = func(current_x + h, current_y + current_k3 * h);
         current_x += h;
-        current_y = current_y + h * (current_k1 + 2. * current_k2 + 2. * current_k3 + current_k4) / 6.;
+        current_y = compute_next_y(h, current_y, current_k1, current_k2, current_k3, current_k4);
     }
     
     printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", (int) n, current_x,  (int) n, current_y);
