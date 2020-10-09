@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < n; i++) {
         printf("x[%2d] = %3.16g; y[%2d] = %3.16g;\n", i, current_x, i, current_y);
         current_k1 = func(current_x, current_y);
-        current_k2 = func(current_x + h / 2., current_y + current_k1 / 2.);
-        current_k3 = func(current_x + h / 2., current_y + current_k2 / 2.);
-        current_k4 = func(current_x + h, current_y + current_k3);
+        current_k2 = func(current_x + h / 2., current_y + current_k1 * h / 2.);
+        current_k3 = func(current_x + h / 2., current_y + current_k2 * h / 2.);
+        current_k4 = func(current_x + h, current_y + current_k3 * h);
         current_x += h;
         current_y = current_y + h * (current_k1 + 2. * current_k2 + 2. * current_k3 + current_k4) / 6.;
     }
