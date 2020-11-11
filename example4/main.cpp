@@ -15,22 +15,20 @@ void printfArray(double *d, int lenght, double t) {
 
 void f(double a, double b, double t, double *x, double *dxdt, int n, int h) {
 	// f
-    //double k = 0.022;
-    // 2 * k * k / (cosh(k * (x[i] - 4 * k * k * t - x0)))
-    for (int i = 0; i < n; i++) {
-        if (i == 0) {
-            x[i - 1] = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
-            x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-        } else if (i == 1) {
-            x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-        } else if (i == n-2) {
-            x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
-        } else if (i == n-1) {
-            x[i + 1] = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
-            x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t)); 
-        }
-        dxdt[i] = - 6 * x[i] * ((x[i+1] - x[i]) / h) 
-                  - ((x[i+2] - 2 * x[i+1] + 2 * x[i-1] - x[i-2]) / (2 * pow(h,3)));
+    for (int i = 2; i < n-2; i++) {
+        // if (i == 0) {
+        //     x[i - 1] = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
+        //     x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+        // } else if (i == 1) {
+        //     x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+        // } else if (i == n-2) {
+        //     x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
+        // } else if (i == n-1) {
+        //     x[i + 1] = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
+        //     x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t)); 
+        // }
+        dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
     }
 }
 
@@ -104,17 +102,16 @@ int main(int argc, char * argv[]) {
     double from = 0.0, to = 1.0; // t (time)
     clock_t start, finish;
 
-
-
     printf("rk4\n");
+
     for (int i = 0; i < n; i++) {
-        x[i] = - 2 / (cosh((b-a) * i / n) * cosh((b-a) * i / n)); // cos(M_PI * (b-a) * i / n); //
+        x[i] = - 2 / (cosh((b-a) * i / n) * cosh((b-a) * i / n));
     }
+
     start = clock();
     rk4(a, b, n, from, x, h, to);
     finish = clock();
     printf("time: %f seconds.\n", ((float) (finish - start)) / CLOCKS_PER_SEC);
-
 
     free(x);
     return 0;
