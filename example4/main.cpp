@@ -89,11 +89,7 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
         }
 
         t += h; 
-    }        
-
-    printfArray(x, n, t);
-    printf("-----------------\n");
-    printf("\n"); 
+    }
 
     free(k1);
     free(k2);
@@ -106,7 +102,7 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
 int main(int argc, char * argv[]) {
     double a = 0, b = 9; // x
     int n = 10; // amount x
-    double h = 0.2; // step t (time)
+    double h = 1; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 1.0, to = 2.0; // t (time)
     clock_t start, finish;
