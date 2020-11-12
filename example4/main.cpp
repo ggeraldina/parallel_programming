@@ -15,20 +15,29 @@ void printfArray(double *d, int lenght, double t) {
 
 void f(double a, double b, double t, double *x, double *dxdt, int n, int h) {
 	// f
-    for (int i = 2; i < n-2; i++) {
-        // if (i == 0) {
-        //     x[i - 1] = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
-        //     x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-        // } else if (i == 1) {
-        //     x[i - 2] = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-        // } else if (i == n-2) {
-        //     x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
-        // } else if (i == n-1) {
-        //     x[i + 1] = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
-        //     x[i + 2] = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t)); 
-        // }
-        dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
-                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+    for (int i = 0; i < n; i++) {
+        if (i == 0) {
+            double x_minus_1 = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
+            double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) / (2 * pow(h, 3)));
+        } else if (i == 1) {
+            double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) / (2 * pow(h, 3)));
+        } else if (i == n-2) {
+            double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+                  - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+        } else if (i == n-1) {
+            double x_plus_1 = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
+            double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
+            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i]) / h) 
+                  - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+        } else {
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+        }
     }
 }
 
@@ -95,17 +104,17 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
 }
 
 int main(int argc, char * argv[]) {
-    double a = 0, b = 2; // x
+    double a = 0, b = 9; // x
     int n = 10; // amount x
     double h = 0.2; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
-    double from = 0.0, to = 1.0; // t (time)
+    double from = 1.0, to = 2.0; // t (time)
     clock_t start, finish;
 
     printf("rk4\n");
 
     for (int i = 0; i < n; i++) {
-        x[i] = - 2 / (cosh((b-a) * i / n) * cosh((b-a) * i / n));
+        x[i] = - 2 / (cosh((b-a) * i / n - 4) * cosh((b-a) * i / n - 4));
     }
 
     start = clock();
