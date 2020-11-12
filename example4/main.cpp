@@ -100,9 +100,9 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
 }
 
 int main(int argc, char * argv[]) {
-    double a = 0, b = 9; // x
+    double a = 0, b = 10; // x
     int n = 10; // amount x
-    double h = 1; // step t (time)
+    double h = 0.5; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 1.0, to = 2.0; // t (time)
     clock_t start, finish;
