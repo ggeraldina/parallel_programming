@@ -19,23 +19,23 @@ void f(double a, double b, double t, double *x, double *dxdt, int n, int h) {
         if (i == 0) {
             double x_minus_1 = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
             double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) / (2 * h)) 
                   - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) / (2 * pow(h, 3)));
         } else if (i == 1) {
             double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
                   - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) / (2 * pow(h, 3)));
         } else if (i == n-2) {
             double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
                   - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
         } else if (i == n-1) {
             double x_plus_1 = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
             double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
-            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i]) / h) 
+            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) / (2 * h)) 
                   - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
         } else {
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i]) / h) 
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
                       - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
         }
     }
@@ -102,7 +102,7 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
 int main(int argc, char * argv[]) {
     double a = 0, b = 10; // x
     int n = 10; // amount x
-    double h = 0.5; // step t (time)
+    double h = 1; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 1.0, to = 2.0; // t (time)
     clock_t start, finish;
