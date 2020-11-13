@@ -9,8 +9,8 @@
 #define HH H*H
 #define HHH H*H*H
 
-void printfArray(double *d, int n, double t, double h, double a, double b) {
-    printf("t = %.8f, time step = %.8f, space step = %.8f\n", t, h, (b - a) / n);
+void printfArray(double *d, int n, double t) {
+    printf("t = %.8f\n", t);
     for (int i = 0; i < n; i++) {
         printf("%.7f ", d[i]);
     }
@@ -44,7 +44,7 @@ void f(double t, double *x, double *dxdt, int n) {
     }
 }
 
-int rk4(double k, double a, double b, int n, double t, double *x, double h, double finish) {
+int rk4(int n, double t, double *x, double h, double finish) {
 
     if (h <= 0 || (finish - t) <= 0) {
         return -1;
@@ -61,12 +61,9 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
         if (t > finish) {
             break;
         }               
-
-        if (t < 0.01) {
-            printfArray(x, n, t, h, a, b);
-            printf("-----------------\n");
-            printf("\n");
-        }
+        
+        printfArray(x, n, t);
+        printf("-----------------\n");
 
         //k1
         f(t, x, k1, n);
@@ -105,25 +102,22 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
 }
 
 int main(int argc, char * argv[]) {
-    double a = 0.0, b = 10.0; // x
+    freopen("output.txt", "w", stdout);
     int n = 50*H; // amount x
     double h = 0.001; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 0.0, to = 10.0; // t (time)
     clock_t start, finish;
 
-    printf("rk4\n");
-
-    double k = 1;
-    for (int i = 0; i < n; i++) {
-        x[i] = 2 * k * k / (
-            cosh(k * ((b - a) * i / n - 4 * k * k * from - a)) 
-            * cosh(k * ((b - a) * i / n - 4 * k * k * from - a))
-        );
+    double k = 1.0;
+    for (int i = 0; i < n; i++)
+    {
+        double xx = i*0.1;
+        x[i] = 2.0 * k * k / (cosh(k * (xx - 25)) * cosh(k * (xx - 25)));
     }
 
     start = clock();
-    rk4(k, a, b, n, from, x, h, to);
+    rk4(n, from, x, h, to);
     finish = clock();
     printf("time: %f seconds.\n", ((float) (finish - start)) / CLOCKS_PER_SEC);
 
