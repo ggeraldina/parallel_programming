@@ -19,7 +19,6 @@ with open("output.txt", "r") as file:
         if t * 10 % 10 != 0: 
             continue
         y = [float(i) for i in data.split()]
-        ax.plot(xs=x, ys=y, zs=t)
-        # ax.scatter(xs=x, ys=t, zs=y, s=0.5, color="b")
+        ax.scatter(xs=x, ys=t, zs=y, s=0.5, color="b")
   
 plt.show()
