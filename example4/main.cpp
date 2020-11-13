@@ -5,6 +5,10 @@
 
 #define M_PI 3.14159265358979323846
 
+#define H 10
+#define HH H*H
+#define HHH H*H*H
+
 void printfArray(double *d, int n, double t, double h, double a, double b) {
     printf("t = %.8f, time step = %.8f, space step = %.8f\n", t, h, (b - a) / n);
     for (int i = 0; i < n; i++) {
@@ -13,29 +17,29 @@ void printfArray(double *d, int n, double t, double h, double a, double b) {
     printf("\n");
 }
 
-void f(double k, double a, double b, double t, double *x, double *dxdt, int n, int h) {
+void f(double t, double *x, double *dxdt, int n) {
     for (int i = 0; i < n; i++) {
         if (i == 0) {
             double x_minus_1 = x[n - 1];
             double x_minus_2 = x[n - 2];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) * 0.5 / h) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) * 0.5 / (h * h * h));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) * 0.5 * H) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) * 0.5 * HHH);
         } else if (i == 1) {
             double x_minus_2 = x[n - 1];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) * 0.5 / (h * h * h));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) * 0.5 * HHH);
         } else if (i == n-1) {
-            double x_plus_1 =  x[0];
+            double x_plus_1 = x[0];
             double x_plus_2 = x[1];
-            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) * 0.5 / h) 
-                      - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
+            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) * 0.5 * H) 
+                      - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
         } else if (i == n-2) {
             double x_plus_2 = x[0];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
-                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
+                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
         } else {
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
         }
     }
 }
@@ -58,32 +62,32 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
             break;
         }               
 
-        if (t == 1 || t == 1.00001 || t == 2) {
+        if (t < 0.01) {
             printfArray(x, n, t, h, a, b);
             printf("-----------------\n");
             printf("\n");
         }
 
         //k1
-        f(k, a, b, t, x, k1, n, h);
+        f(t, x, k1, n);
         //k2
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k1[i];
         }
-        f(k, a, b, t + 0.5 * h, temp, k2, n, h);
+        f(t + 0.5 * h, temp, k2, n);
         //k3
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k2[i];
         }
-        f(k, a, b, t + 0.5 * h, temp, k3, n, h);
+        f(t + 0.5 * h, temp, k3, n);
         //k4
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + h * k3[i];
         }
-        f(k, a, b, t + h, temp, k4, n, h);
+        f(t + h, temp, k4, n);
         //res
         for (int i = 0; i < n; i++) {
             x[i] += h * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6.0;
@@ -101,11 +105,11 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
 }
 
 int main(int argc, char * argv[]) {
-    double a = 0, b = 10; // x
-    int n = 1000; // amount x
-    double h = 0.00001; // step t (time)
+    double a = 0.0, b = 10.0; // x
+    int n = 50*H; // amount x
+    double h = 0.001; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
-    double from = 1.0, to = 2.0; // t (time)
+    double from = 0.0, to = 10.0; // t (time)
     clock_t start, finish;
 
     printf("rk4\n");
