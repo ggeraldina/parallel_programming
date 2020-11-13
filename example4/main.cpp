@@ -1,16 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include <math.h>
-
-#define M_PI 3.14159265358979323846
 
 #define H 10
 #define HH H*H
 #define HHH H*H*H
 
 void printfArray(double *d, int n, double t) {
-    printf("t = %.8f\n", t);
+    printf("%.8f\n", t);
     for (int i = 0; i < n; i++) {
         printf("%.7f ", d[i]);
     }
@@ -63,7 +60,6 @@ int rk4(int n, double t, double *x, double h, double finish) {
         }               
         
         printfArray(x, n, t);
-        printf("-----------------\n");
 
         //k1
         f(t, x, k1, n);
@@ -107,23 +103,15 @@ int main(int argc, char * argv[]) {
     double h = 0.001; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 0.0, to = 10.0; // t (time)
-    clock_t start, finish;
 
-    double k = 1.0;
     for (int i = 0; i < n; i++)
     {
         double xx = i*0.1;
-        x[i] = 2.0 * k * k / (cosh(k * (xx - 25)) * cosh(k * (xx - 25)));
+        x[i] = 2.0 / (cosh(xx - 25) * cosh(xx - 25));
     }
 
-    start = clock();
     rk4(n, from, x, h, to);
-    finish = clock();
-    printf("time: %f seconds.\n", ((float) (finish - start)) / CLOCKS_PER_SEC);
-
+    
     free(x);
     return 0;
 }
-
-// график = 2 / (ch(x -4*t) * ch(x-4*t)), t=1
-// http://yotx.ru/#!1/3_h/ubWwf7Wwf7Rgzhf23/aP9g/2DfT0qt7e9sb/zyN/Y2QeCtXfAvf2NvEwTe2t3dP9gn0bAbO6eMx9MtxuPW5cXu/tY%40Ag==
