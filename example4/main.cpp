@@ -28,15 +28,15 @@ void f(double t, double *x, double *dxdt, int n) {
             double x_minus_2 = x[n - 1];
             dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
                       - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) * 0.5 * HHH);
+        } else if (i == n-2) {
+            double x_plus_2 = x[0];
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
+                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);        
         } else if (i == n-1) {
             double x_plus_1 = x[0];
             double x_plus_2 = x[1];
             dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) * 0.5 * H) 
                       - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
-        } else if (i == n-2) {
-            double x_plus_2 = x[0];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
-                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
         } else {
             dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 * H) 
                       - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 * HHH);
