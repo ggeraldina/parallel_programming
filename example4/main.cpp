@@ -13,27 +13,51 @@ void printfArray(double *d, int lenght, double t) {
     printf("\n");
 }
 
-void f(double a, double b, double t, double *x, double *dxdt, int n, int h) {
+void f(double k, double a, double b, double t, double *x, double *dxdt, int n, int h) {
 	// f
     for (int i = 0; i < n; i++) {
         if (i == 0) {
-            double x_minus_1 = - 2 / (cosh((a - 1 / n) - 4 * t) * cosh((a - 1 / n) - 4 * t));
-            double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+            double x_minus_1 = x[0];
+            // 2 * k * k / (
+            //     cosh(k * ((a - 1 / n) - 4 * k * k * t - (a - 2 / n)))
+            //     * cosh(k * ((a - 1 / n) - 4 * k * k * t - (a - 2 / n)))
+            // );
+            double x_minus_2 = x[0];
+            // 2 * k * k / (
+            //     cosh(k * ((a - 2 / n) - 4 * k * k * t - (a - 2 / n)))
+            //     * cosh(k * ((a - 2 / n) - 4 * k * k * t - (a - 2 / n)))
+            // );
             dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) / (2 * h)) 
-                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) / (2 * pow(h, 3)));
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) / (2 * pow(h, 3)));
         } else if (i == 1) {
-            double x_minus_2 = - 2 / (cosh((a - 2 / n) - 4 * t) * cosh((a - 2 / n) - 4 * t));
+            double x_minus_2 = x[0];
+            // 2 * k * k / (
+            //     cosh(k * ((a - 2 / n) - 4 * k * k * t - (a - 1 / n)))
+            //     * cosh(k * ((a - 2 / n) - 4 * k * k * t - (a - 1 / n)))
+            // );
             dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
-                  - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) / (2 * pow(h, 3)));
-        } else if (i == n-2) {
-            double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
-                  - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) / (2 * pow(h, 3)));
         } else if (i == n-1) {
-            double x_plus_1 = - 2 / (cosh((b + 1 / n) - 4 * t) * cosh((b + 1 / n) - 4 * t));
-            double x_plus_2 = - 2 / (cosh((b + 2 / n) - 4 * t) * cosh((b + 2 / n) - 4 * t));
+            double x_plus_1 =  x[n-1];
+            // 2 * k * k / (
+            //     cosh(k * ((b + 1 / n) - 4 * k * k * t - a))
+            //     * cosh(k * ((b + 1 / n) - 4 * k * k * t - a))
+            // );
+            double x_plus_2 = x[n-1];
+            // 2 * k * k / (
+            //     cosh(k * ((b + 2 / n) - 4 * k * k * t - a))
+            //     * cosh(k * ((b + 2 / n) - 4 * k * k * t - a))
+            // );
             dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) / (2 * h)) 
-                  - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+                      - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+        } else if (i == n-2) {
+            double x_plus_2 = x[n-1];
+            // 2 * k * k / (
+            //     cosh(k * ((b + 2 / n) - 4 * k * k * t - a))
+            //     * cosh(k * ((b + 2 / n) - 4 * k * k * t - a))
+            // );
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
+                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
         } else {
             dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
                       - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
@@ -41,7 +65,7 @@ void f(double a, double b, double t, double *x, double *dxdt, int n, int h) {
     }
 }
 
-int rk4(double a, double b, int n, double t, double *x, double h, double finish) {
+int rk4(double k, double a, double b, int n, double t, double *x, double h, double finish) {
 
     if (h <= 0 || (finish - t) <= 0) {
         return -1;
@@ -64,25 +88,25 @@ int rk4(double a, double b, int n, double t, double *x, double h, double finish)
         printf("\n");
 
         //k1
-        f(a, b, t, x, k1, n, h);
+        f(k, a, b, t, x, k1, n, h);
         //k2
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k1[i];
         }
-        f(a, b, t + 0.5 * h, temp, k2, n, h);
+        f(k, a, b, t + 0.5 * h, temp, k2, n, h);
         //k3
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k2[i];
         }
-        f(a, b, t + 0.5 * h, temp, k3, n, h);
+        f(k, a, b, t + 0.5 * h, temp, k3, n, h);
         //k4
 		//
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + h * k3[i];
         }
-        f(a, b, t + h, temp, k4, n, h);
+        f(k, a, b, t + h, temp, k4, n, h);
         //res
         for (int i = 0; i < n; i++) {
             x[i] += h * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6.0;
@@ -109,12 +133,16 @@ int main(int argc, char * argv[]) {
 
     printf("rk4\n");
 
+    double k = 1;
     for (int i = 0; i < n; i++) {
-        x[i] = - 2 / (cosh((b-a) * i / n - 4) * cosh((b-a) * i / n - 4));
+        x[i] = 2 * k * k / (
+            cosh(k * ((b - a) * i / n - 4 * k * k * from - a)) 
+            * cosh(k * ((b - a) * i / n - 4 * k * k * from - a))
+        );
     }
 
     start = clock();
-    rk4(a, b, n, from, x, h, to);
+    rk4(k, a, b, n, from, x, h, to);
     finish = clock();
     printf("time: %f seconds.\n", ((float) (finish - start)) / CLOCKS_PER_SEC);
 
