@@ -150,5 +150,5 @@ int main(int argc, char * argv[]) {
     return 0;
 }
 
-// график - 2 / (ch(x -4*t) * ch(x-4*t)), t=1
-// http://yotx.ru/#!1/3_h/ubWwf7Wwf7Rgzhf23/aP9g/2DfT0qt7W/ubG/88jf2NkHgrV3wL39jbxME3trd3T/YJ9GwGzunjMfTLcbj1uXF7v7WPgI=
+// график = 2 / (ch(x -4*t) * ch(x-4*t)), t=1
+// http://yotx.ru/#!1/3_h/ubWwf7Wwf7Rgzhf23/aP9g/2DfT0qt7e9sb/zyN/Y2QeCtXfAvf2NvEwTe2t3dP9gn0bAbO6eMx9MtxuPW5cXu/tY%40Ag==
