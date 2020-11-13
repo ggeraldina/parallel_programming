@@ -6,7 +6,7 @@
 #define M_PI 3.14159265358979323846
 
 void printfArray(double *d, int n, double t, double h, double a, double b) {
-    printf("t = %.3f, time step = %.3f, space step = %.3f\n", t, h, (b - a) / n);
+    printf("t = %.8f, time step = %.8f, space step = %.8f\n", t, h, (b - a) / n);
     for (int i = 0; i < n; i++) {
         printf("%.7f ", d[i]);
     }
@@ -14,29 +14,28 @@ void printfArray(double *d, int n, double t, double h, double a, double b) {
 }
 
 void f(double k, double a, double b, double t, double *x, double *dxdt, int n, int h) {
-	// f
     for (int i = 0; i < n; i++) {
         if (i == 0) {
             double x_minus_1 = x[n - 1];
             double x_minus_2 = x[n - 2];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) / (2 * h)) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) / (2 * pow(h, 3)));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x_minus_1) * 0.5 / h) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x_minus_1 - x_minus_2) * 0.5 / (h * h * h));
         } else if (i == 1) {
             double x_minus_2 = x[n - 1];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) / (2 * pow(h, 3)));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x_minus_2) * 0.5 / (h * h * h));
         } else if (i == n-1) {
             double x_plus_1 =  x[0];
             double x_plus_2 = x[1];
-            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) / (2 * h)) 
-                      - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+            dxdt[i] = - 6 * x[i] * ((x_plus_1 - x[i - 1]) * 0.5 / h) 
+                      - ((x_plus_2 - 2 * x_plus_1 + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
         } else if (i == n-2) {
             double x_plus_2 = x[0];
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
-                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
+                      - ((x_plus_2 - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
         } else {
-            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) / (2 * h)) 
-                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) / (2 * pow(h, 3)));
+            dxdt[i] = - 6 * x[i] * ((x[i + 1] - x[i - 1]) * 0.5 / h) 
+                      - ((x[i + 2] - 2 * x[i + 1] + 2 * x[i - 1] - x[i - 2]) * 0.5 / (h * h * h));
         }
     }
 }
@@ -59,9 +58,11 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
             break;
         }               
 
-        printfArray(x, n, t, h, a, b);
-        printf("-----------------\n");
-        printf("\n");
+        if (t == 1 || t == 1.00001 || t == 2) {
+            printfArray(x, n, t, h, a, b);
+            printf("-----------------\n");
+            printf("\n");
+        }
 
         //k1
         f(k, a, b, t, x, k1, n, h);
@@ -101,8 +102,8 @@ int rk4(double k, double a, double b, int n, double t, double *x, double h, doub
 
 int main(int argc, char * argv[]) {
     double a = 0, b = 10; // x
-    int n = 20; // amount x
-    double h = pow(((b - a) / n), 2); // step t (time)
+    int n = 1000; // amount x
+    double h = 0.00001; // step t (time)
     double *x = (double*) malloc(n * sizeof (double));
     double from = 1.0, to = 2.0; // t (time)
     clock_t start, finish;
