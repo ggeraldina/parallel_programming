@@ -1,41 +1,32 @@
 #pragma comment(lib, "C:\\Program Files (x86)\\Microsoft SDKs\\MPI\\Lib\\x86\\msmpi.lib")
 
-#include "stdint.h"
 #include "mpi.h"
-
-#include <mpi.h>
 #include <stdio.h>
-
-int main(int argc, char** argv) {
-    // Initialize the MPI environment
-    MPI_Init(NULL, NULL);
-
-    // Get the number of processes
-    int world_size;
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-
-    // Get the rank of the process
-    int world_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-
-    // Get the name of the processor
-    char processor_name[MPI_MAX_PROCESSOR_NAME];
-    int name_len;
-    MPI_Get_processor_name(processor_name, &name_len);
-
-    // Print off a hello world message
-    printf("Hello world from processor %s, rank %d out of %d processors\n",
-           processor_name, world_rank, world_size);
-
-    // Finalize the MPI environment.
-    MPI_Finalize();
+int main(int argc, char **argv)
+{
+   int rank;
+   float a, b;
+   MPI_Status status;
+   MPI_Init(&argc, &argv);
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   a = 0.0;
+   b = 0.0;
+   if(rank == 0)
+   {
+      b = 3.14159;
+      MPI_Send(&b, 1, MPI_FLOAT, 1, 5, MPI_COMM_WORLD);
+      MPI_Recv(&a, 1, MPI_FLOAT, 1, 5, MPI_COMM_WORLD, &status);	  
+   
+   }
+   if(rank == 1)
+   {
+      a = 2.71828;
+      MPI_Recv(&b, 1, MPI_FLOAT, 0, 5, MPI_COMM_WORLD, &status);
+      MPI_Send(&a, 1, MPI_FLOAT, 0, 5, MPI_COMM_WORLD);	  
+   }
+   printf("process %d a = %f, b = %f\n", rank, a, b);
+   MPI_Finalize();
 }
 
 // запуск 
 // mpiexec -n 4 Debug\main.exe 
-
-// результат
-// Hello world from processor LAPTOP-L5V2ME7C, rank 1 out of 4 processors
-// Hello world from processor LAPTOP-L5V2ME7C, rank 0 out of 4 processors
-// Hello world from processor LAPTOP-L5V2ME7C, rank 2 out of 4 processors
-// Hello world from processor LAPTOP-L5V2ME7C, rank 3 out of 4 processors
