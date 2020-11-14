@@ -26,13 +26,6 @@ void f(double t, double *x, double *dxdt, int n) {
     {
         dxdt[i] = - 6 * x[i] * (x[i+1] - x[i-1]) * 0.5 * N
                   - (x[i+2] - 2 * x[i+1] + 2 * x[i-1] - x[i-2]) * 0.5 * NNN;
-        
-        printf(
-            "\n!!!fun %d Закончил работу поток №%d из %d потоков\n", 
-            i,
-            omp_get_thread_num(), 
-            omp_get_num_threads()
-        );
     }
     i = n-2;
     dxdt[i] = - 6 * x[i] * (x[i+1] - x[i-1]) * 0.5 * N
@@ -69,48 +62,24 @@ int rk4(int n, double t, double *x, double h, double finish) {
 #pragma omp parallel for
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k1[i];
-            printf(
-                "\nk2 %d Закончил работу поток №%d из %d потоков\n", 
-                i,
-                omp_get_thread_num(), 
-                omp_get_num_threads()
-            );
         }
         f(t + 0.5 * h, temp, k2, n);
         //k3
 #pragma omp parallel for
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + 0.5 * h * k2[i];
-            printf(
-                "\nk3 %d Закончил работу поток №%d из %d потоков\n", 
-                i,
-                omp_get_thread_num(), 
-                omp_get_num_threads()
-            );
         }
         f(t + 0.5 * h, temp, k3, n);
         //k4
 #pragma omp parallel for
         for (int i = 0; i < n; i++) {
             temp[i] = x[i] + h * k3[i];
-            printf(
-                "\nk4 %d Закончил работу поток №%d из %d потоков\n", 
-                i,
-                omp_get_thread_num(), 
-                omp_get_num_threads()
-            );
         }
         f(t + h, temp, k4, n);
         //res
 #pragma omp parallel for
         for (int i = 0; i < n; i++) {
             x[i] += h * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6.0;
-            printf(
-                "\nx %d Закончил работу поток №%d из %d потоков\n", 
-                i,
-                omp_get_thread_num(), 
-                omp_get_num_threads()
-            );
         }
 
         t += h; 
@@ -148,7 +117,6 @@ int main(int argc, char * argv[]) {
     end_time = omp_get_wtime();
 
     freopen("CON", "w", stdout);
-    printf("\nКоличество потоков: %d\n", omp_get_num_threads());
     printf("\nЗатраченное время: %.16g\n", end_time - start_time);
     
     free(x);
