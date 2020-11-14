@@ -14,15 +14,12 @@ int main(int argc, char **argv)
    if(rank == 0)
    {
       b = 3.14159;
-      MPI_Send(&b, 1, MPI_FLOAT, 1, 5, MPI_COMM_WORLD);
-      MPI_Recv(&a, 1, MPI_FLOAT, 1, 5, MPI_COMM_WORLD, &status);	  
-   
+	  MPI_Sendrecv(&b, 1, MPI_FLOAT, 1, 5, &a, 1, MPI_FLOAT, 1, 5, MPI_COMM_WORLD, &status);
    }
    if(rank == 1)
    {
       a = 2.71828;
-      MPI_Recv(&b, 1, MPI_FLOAT, 0, 5, MPI_COMM_WORLD, &status);
-      MPI_Send(&a, 1, MPI_FLOAT, 0, 5, MPI_COMM_WORLD);	  
+	  MPI_Sendrecv(&a, 1, MPI_FLOAT, 0, 5, &b, 1, MPI_FLOAT, 0, 5, MPI_COMM_WORLD, &status);
    }
    printf("process %d a = %f, b = %f\n", rank, a, b);
    MPI_Finalize();
@@ -30,3 +27,9 @@ int main(int argc, char **argv)
 
 // запуск 
 // mpiexec -n 4 Debug\main.exe 
+
+
+// process 0 a = 2.718280, b = 3.141590
+// process 3 a = 0.000000, b = 0.000000
+// process 1 a = 2.718280, b = 3.141590
+// process 2 a = 0.000000, b = 0.000000
