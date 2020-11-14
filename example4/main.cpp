@@ -104,10 +104,11 @@ int main(int argc, char * argv[]) {
     double *x = (double*) malloc(n * sizeof (double));
     double from = 0.0, to = 10.0; // t (time)
 
+    double k = 2.0;
     for (int i = 0; i < n; i++)
     {
         double xx = i*0.1;
-        x[i] = 2.0 / (cosh(xx - 25) * cosh(xx - 25));
+        x[i] = 2.0 * k * k / (cosh(k * (xx - 25)) * cosh(k * (xx - 25)));
     }
 
     rk4(n, from, x, h, to);
