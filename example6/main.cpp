@@ -68,7 +68,6 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
         if (rank == 0) {
             MPI_Status status;
             MPI_Recv(&(x[end_n]), n-end_n, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, &status);
-            // MPI_Send(&(x[0]), end_n, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);
             MPI_Send(&(x[end_n-2]), 2, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);            
             MPI_Send(&(x[0]), 2, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD);
             printfArray(x, n, t);
@@ -76,10 +75,8 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
         if (rank == 1) {
             MPI_Status status, status2;
             MPI_Send(&(x[start_n]), n-start_n, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-            // MPI_Recv(&(x[0]), start_n, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&(x[start_n-2]), 2, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
             MPI_Recv(&(x[0]), 2, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, &status2);
-            printfArray(x, n, t);
         }
 
         int edge_n[4] = {n-1, n-2, end_n, end_n+1};
@@ -134,11 +131,12 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
 
 int main(int argc, char * argv[]) { 
     system("chcp 65001"); // utf-8
+
     // ввод параметров    
-    double from = atof(argv[1]), to = atof(argv[2]); // t (time) => 0 and 5.0
-    double h = atof(argv[3]); // step t (time) => 0.0001
+    double from = atof(argv[1]), to = atof(argv[2]); // 0 and 5.0 - t (time)
+    double h = atof(argv[3]); // 0.0001 - step t (time)
     double k = atof(argv[4]); // 2
-    double x0 = atof(argv[5]); // 30
+    double x0 = atof(argv[5]); // 50
 
     int rank = 0,  size = 2;    
     MPI_Init(&argc,&argv);
@@ -146,9 +144,6 @@ int main(int argc, char * argv[]) {
 
     if (rank == 0) {  
         freopen("output.txt", "w", stdout);
-    }
-    if (rank == 1) {
-        freopen("output_2.txt", "w", stdout);
     }
 
     int n = 100*N; // amount x
@@ -165,8 +160,6 @@ int main(int argc, char * argv[]) {
         end_n = n;
         break;
     default:
-        freopen("CON", "w", stdout);
-        printf("\nРассчитано на 2 процесса. Запущенный процесс %d закрыт.\n", rank);
         MPI_Finalize();
         return 0;
     }
@@ -186,6 +179,6 @@ int main(int argc, char * argv[]) {
 }
 
 // запуск 
-// параметры start_time=0, end_time=10.0 step_time=h=0.001 k=0.5 x0=30
+// параметры start_time=0, end_time=5.0 step_time=h=0.0001 k=2 x0=50
 // наилучшие
-// mpiexec -n 2 Debug\main.exe 0. 5.0 0.0001 2 30 
+// mpiexec -n 2 Debug\main.exe 0. 5.0 0.0001 2 50 
