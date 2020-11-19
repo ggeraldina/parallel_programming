@@ -68,16 +68,26 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
         if (rank == 0) {
             MPI_Status status;
             MPI_Recv(&(x[end_n]), n-end_n, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, &status);
-            MPI_Send(&(x[end_n-2]), 2, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);            
-            MPI_Send(&(x[0]), 2, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD);
+            MPI_Send(&(x[0]), end_n, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);
+            // MPI_Send(&(x[end_n-2]), 2, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);            
+            // MPI_Send(&(x[0]), 2, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD);
             printfArray(x, n, t);
         } 
         if (rank == 1) {
             MPI_Status status, status2;
             MPI_Send(&(x[start_n]), n-start_n, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-            MPI_Recv(&(x[start_n-2]), 2, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
-            MPI_Recv(&(x[0]), 2, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, &status2);
+            MPI_Recv(&(x[0]), start_n, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
+            // MPI_Recv(&(x[start_n-2]), 2, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
+            // MPI_Recv(&(x[0]), 2, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, &status2);
             printfArray(x, n, t);
+        }
+
+        int edge_n[4] = {n-1, n-2, end_n, end_n+1};
+        if (rank == 1) {
+            edge_n[0] = start_n-2;
+            edge_n[1] = start_n-1;
+            edge_n[2] = 1;
+            edge_n[3] = 0;
         }
 
         //k1
@@ -86,15 +96,24 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
         for (int i = start_n; i < end_n; i++) {
             temp[i] = x[i] + 0.5 * h * k1[i];
         }
+        for (int i = 0; i < 4; i++) {
+            temp[edge_n[i]] = x[edge_n[i]] + 0.5 * h * k1[edge_n[i]];
+        }
         f(rank, start_n, end_n, t + 0.5 * h, temp, k2, n);
         //k3
         for (int i = start_n; i < end_n; i++) {
             temp[i] = x[i] + 0.5 * h * k2[i];
         }
+        for (int i = 0; i < 4; i++) {
+            temp[edge_n[i]] = x[edge_n[i]] + 0.5 * h * k2[edge_n[i]];
+        }
         f(rank, start_n, end_n, t + 0.5 * h, temp, k3, n);
         //k4
         for (int i = start_n; i < end_n; i++) {
             temp[i] = x[i] + h * k3[i];
+        }
+        for (int i = 0; i < 4; i++) {
+            temp[edge_n[i]] = x[edge_n[i]] + h * k3[edge_n[i]];
         }
         f(rank, start_n, end_n, t + h, temp, k4, n);
         //res
