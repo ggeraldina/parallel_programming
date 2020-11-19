@@ -76,7 +76,8 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
             MPI_Status status;
             MPI_Send(&(x[start_n]), n-start_n, MPI_FLOAT, 0, 0, MPI_COMM_WORLD);
             MPI_Recv(&(x[start_n-2]), 1, MPI_FLOAT, 0, 1, MPI_COMM_WORLD, &status);
-            MPI_Recv(&(x[start_n-1]), 1, MPI_FLOAT, 0, 2, MPI_COMM_WORLD, &status);
+            MPI_Recv(&(x[start_n-1]), 1, MPI_FLOAT, 0, 2, MPI_COMM_WORLD, &status);	
+            printfArray(x, n, t);
         }
 
         //k1
@@ -119,6 +120,9 @@ int main(int argc, char * argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     if (rank == 0) {
         freopen("output.txt", "w", stdout);
+    }
+    if (rank == 1) {
+        freopen("output_2.txt", "w", stdout);
     }
     int n = 50*N; // amount x
     int center_n = int (n / 2);
