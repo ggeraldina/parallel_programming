@@ -25,10 +25,15 @@ OpenMP ](https://parallel.ru/sites/default/files/info/parallel/openmp/OpenMP.pdf
 * example5 - разные приммеры, в том числе из лекций
 * example6 - решение уравнения [Кортевега-де Фриза](https://ru.wikipedia.org/wiki/Уравнение_Кортевега_—_де_Фриза) методом [Рунге-Кутты](https://ru.wikipedia.org/wiki/Метод_Рунге_—_Кутты)
 
-Первая проба...
-Первый и второй процессы
+
+Решение 
+
+    // Параметры времени start_time=0, end_time=5.0 step_time=h=0.0001 
+    // Параметры начальной формулы k=2 x0=50
+    > mpiexec -n 2 Debug\main.exe 0. 5.0 0.0001 2 50 
+
+
 <div style="text-align:center">
-    <img alt="Картинка" src="readme_images/Figure_3.png" width="30%" vspace="15" hspace="15">
-    <img alt="Картинка" src="readme_images/Figure_4.png" width="30%" vspace="15" hspace="15">
+    <img alt="Картинка" src="readme_images/Figure_7.png" width="100%" vspace="15" hspace="15">
 </div>
 
