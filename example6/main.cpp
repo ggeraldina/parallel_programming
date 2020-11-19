@@ -68,17 +68,17 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
         if (rank == 0) {
             MPI_Status status;
             MPI_Recv(&(x[end_n]), n-end_n, MPI_DOUBLE, 1, 0, MPI_COMM_WORLD, &status);
-            MPI_Send(&(x[0]), end_n, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);
-            // MPI_Send(&(x[end_n-2]), 2, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);            
-            // MPI_Send(&(x[0]), 2, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD);
+            // MPI_Send(&(x[0]), end_n, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);
+            MPI_Send(&(x[end_n-2]), 2, MPI_DOUBLE, 1, 1, MPI_COMM_WORLD);            
+            MPI_Send(&(x[0]), 2, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD);
             printfArray(x, n, t);
         } 
         if (rank == 1) {
             MPI_Status status, status2;
             MPI_Send(&(x[start_n]), n-start_n, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-            MPI_Recv(&(x[0]), start_n, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
-            // MPI_Recv(&(x[start_n-2]), 2, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
-            // MPI_Recv(&(x[0]), 2, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, &status2);
+            // MPI_Recv(&(x[0]), start_n, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&(x[start_n-2]), 2, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, &status);
+            MPI_Recv(&(x[0]), 2, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD, &status2);
             printfArray(x, n, t);
         }
 
@@ -132,18 +132,26 @@ int rk4(int rank, int start_n, int end_n, int n, double t, double *x, double h, 
     return 0;
 }
 
-int main(int argc, char * argv[]) {    
+int main(int argc, char * argv[]) { 
     system("chcp 65001"); // utf-8
-    int rank = 0,  size = 2;
+    // ввод параметров    
+    double from = atof(argv[1]), to = atof(argv[2]); // t (time) => 0 and 5.0
+    double h = atof(argv[3]); // step t (time) => 0.0001
+    double k = atof(argv[4]); // 2
+    double x0 = atof(argv[5]); // 30
+
+    int rank = 0,  size = 2;    
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    if (rank == 0) {
+
+    if (rank == 0) {  
         freopen("output.txt", "w", stdout);
     }
     if (rank == 1) {
         freopen("output_2.txt", "w", stdout);
     }
-    int n = 50*N; // amount x
+
+    int n = 100*N; // amount x
     int center_n = int (n / 2);
     int start_n = 0, end_n = n;
     switch (rank)
@@ -162,16 +170,13 @@ int main(int argc, char * argv[]) {
         MPI_Finalize();
         return 0;
     }
-    double h = 0.001; // step t (time)
 
     double *x = (double*) malloc(n * sizeof (double));
-    double from = 0.0, to = 10.0; // t (time)
 
-    double k = 1.0;
     for (int i = start_n; i < end_n; i++)
     {
         double xx = i*0.1;
-        x[i] = 2.0 * k * k / (cosh(k * (xx - 25)) * cosh(k * (xx - 25)));
+        x[i] = 2.0 * k * k / (cosh(k * (xx - x0)) * cosh(k * (xx - x0)));
     }
 
     rk4(rank, start_n, end_n, n, from, x, h, to);
@@ -179,3 +184,8 @@ int main(int argc, char * argv[]) {
     free(x);
     MPI_Finalize();
 }
+
+// запуск 
+// параметры start_time=0, end_time=10.0 step_time=h=0.001 k=0.5 x0=30
+// наилучшие
+// mpiexec -n 2 Debug\main.exe 0. 5.0 0.0001 2 30 
